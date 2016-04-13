@@ -29,6 +29,7 @@ If you look at the scheduling part, look at the scheduling item class"""
 import time
 import re
 import itertools
+import uuid
 
 try:
     from ClusterShell.NodeSet import NodeSet, NodeSetParseRangeError
@@ -196,6 +197,9 @@ class Service(SchedulingItem):
             BoolProp(default=False, fill_brok=['full_status']),
         # Treat downtimes as acknowledgements in smart notifications
         'business_rule_downtime_as_ack':
+            BoolProp(default=False, fill_brok=['full_status']),
+        # Treat acknowledged host/service like an Ok/Up state in a business rule
+        'business_rule_ack_as_ok':
             BoolProp(default=False, fill_brok=['full_status']),
         # Enforces child nodes notification options
         'business_rule_host_notification_options':
@@ -547,6 +551,12 @@ class Service(SchedulingItem):
 #                         __/ |
 #                        |___/
 ######
+
+    def get_newid(self):
+        cls = self.__class__
+        value = uuid.uuid1().hex
+        cls.id += 1
+        return value
 
     def __repr__(self):
         return '<Service host_name=%r desc=%r name=%r use=%r />' % (
